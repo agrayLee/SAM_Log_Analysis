@@ -1,0 +1,4 @@
+sam_logs.db
+sam_logs.db-journal
+*.log
+node_modules

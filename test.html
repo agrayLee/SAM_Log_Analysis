@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>山姆日志系统 - TDD白盒测试页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .test-button.success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .test-result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-result.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .test-result.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .test-result.running {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .status-badge.pass {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.fail {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-badge.running {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .test-controls {
+                flex-direction: column;
+            }
+
+            .test-button {
+                min-width: 100%;
+            }
+        }
+
+        .test-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .test-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>山姆日志系统 - TDD白盒测试平台</h1>
+            <p>本测试页面提供独立的功能模块测试、Mock数据生成和API模拟功能</p>
+            <p style="margin-top: 10px; color: #999;">遵循TDD原则，确保每个功能模块都能独立验证</p>
+        </div>
+
+        <!-- 测试区域 -->
+        <div class="grid-2">
+            <!-- API连接测试 -->
+            <div class="test-section">
+                <h3>1. API连接测试</h3>
+                <div class="test-controls">
+                    <button class="test-button" onclick="testAPIConnection()">测试API连接</button>
+                    <button class="test-button secondary" onclick="testHealthCheck()">健康检查</button>
+                </div>
+                <div id="api-test-result" class="test-result">点击按钮开始测试...</div>
+            </div>
+
+            <!-- 认证模块测试 -->
+            <div class="test-section">
+                <h3>2. 认证模块测试</h3>
+                <input type="text" id="test-username" class="test-input" placeholder="用户名 (默认: admin)" value="admin">
+                <input type="password" id="test-password" class="test-input" placeholder="密码 (默认: admin123)" value="admin123">
+                <div class="test-controls">
+                    <button class="test-button" onclick="testLogin()">测试登录</button>
+                    <button class="test-button secondary" onclick="testLogout()">测试登出</button>
+                </div>
+                <div id="auth-test-result" class="test-result">等待测试...</div>
+            </div>
+
+            <!-- 日志查询模块测试 -->
+            <div class="test-section">
+                <h3>3. 日志查询模块测试</h3>
+                <input type="text" id="test-plate" class="test-input" placeholder="车牌号 (例如: 闽A)" value="">
+                <div class="test-controls">
+                    <button class="test-button" onclick="testLogQuery()">查询日志</button>
+                    <button class="test-button success" onclick="testLogQueryWithMock()">使用Mock数据测试</button>
+                </div>
+                <div id="log-query-test-result" class="test-result">等待测试...</div>
+            </div>
+
+            <!-- 数据导出模块测试 -->
+            <div class="test-section">
+                <h3>4. 数据导出模块测试</h3>
+                <div class="test-controls">
+                    <button class="test-button" onclick="testExportData()">测试CSV导出</button>
+                    <button class="test-button success" onclick="testExportWithMock()">使用Mock数据导出</button>
+                </div>
+                <div id="export-test-result" class="test-result">等待测试...</div>
+            </div>
+        </div>
+
+        <!-- Mock数据管理 -->
+        <div class="test-section">
+            <h3>5. Mock数据管理工具</h3>
+            <div class="test-controls">
+                <button class="test-button" onclick="generateMockData()">生成测试数据</button>
+                <button class="test-button secondary" onclick="viewMockData()">查看Mock数据</button>
+                <button class="test-button" onclick="clearMockData()">清空Mock数据</button>
+                <button class="test-button success" onclick="downloadMockData()">下载Mock数据</button>
+            </div>
+            <div id="mock-data-result" class="test-result">暂无Mock数据</div>
+        </div>
+
+        <!-- 综合集成测试 -->
+        <div class="test-section">
+            <h3>6. 综合集成测试</h3>
+            <div class="test-controls">
+                <button class="test-button" onclick="runAllTests()">运行所有测试</button>
+                <button class="test-button secondary" onclick="runQuickTest()">快速验证测试</button>
+            </div>
+            <div id="integration-test-result" class="test-result">点击按钮开始综合测试...</div>
+        </div>
+    </div>
+
+    <!-- 加载测试逻辑 -->
+    <script src="test.js"></script>
+</body>
+</html>
